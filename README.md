@@ -16,5 +16,7 @@ git clone https://github.com/gilphilbert/moosic-oled.git
 ```
 
 ## Running
+```
 cd ~/moosic-oled
 ./moosic.py
+```
