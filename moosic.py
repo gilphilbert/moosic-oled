@@ -39,7 +39,7 @@ client.connect(host, port)
 
 #load fonts (so we only have to do this once)
 titleFont = ImageFont.truetype('sen-bold.ttf', 18)
-font = ImageFont.truetype('VerdanaPro-Regular.ttf', 11)
+font = ImageFont.truetype('sen-regular.ttf', 11)
 
 ### --> Format time to strings for display
 def format_time(seconds):
