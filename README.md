@@ -6,10 +6,9 @@ Raspberry Pi running Raspbian
 OLED supported by luma.oled
 
 ## Installation
-Install Python 3 and pip:
+Install Python3 and pip3:
 ```
 sudo apt install python3-dev python3-pip libfreetype6-dev libjpeg-dev build-essential libopenjp2-7 libtiff5
-(install latest pip3)
 
 sudo -H pip install --upgrade luma.oled python-mpd2
 
