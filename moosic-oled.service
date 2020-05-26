@@ -1,0 +1,14 @@
+[Unit]
+Description=Moosic OLED server
+After=mpd.service
+
+[Service]
+ExecStart=/opt/moosic-oled/moosic.py
+Restart=on-failure
+User=moosic
+Group=moosic
+Type=simple
+WorkingDirectory=/opt/moosic-oled
+
+[Install]
+WantedBy=multi-user.target
