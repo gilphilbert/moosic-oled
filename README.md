@@ -16,7 +16,6 @@ sudo apt install python3-dev python3-pip libfreetype6-dev libjpeg-dev build-esse
 For OLED displays:
 ```
 sudo -H pip3 install --upgrade luma.oled python-mpd2
-```
 git clone https://github.com/gilphilbert/moosic-oled.git
 ```
 
