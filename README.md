@@ -24,3 +24,10 @@ git clone https://github.com/gilphilbert/moosic-oled.git
 cd ~/moosic-oled
 ./moosic.py
 ```
+
+## Running as a service
+```
+sudo cp moosic-oled.service /etc/systemd/system/
+sudo systemctl enable moosic-oled
+sudo systemctl start moosic-oled
+```
