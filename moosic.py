@@ -9,7 +9,8 @@ from select import select
 #mpd library
 from mpd import MPDClient
 
-from ssd1306 import drawScreen
+#from ssd1306 import drawScreen
+from fb import drawScreen
 
 #this is the MPD host we're connecting to (should be localhost for production)
 host = '127.0.0.1'
@@ -22,7 +23,9 @@ client.timeout = 10
 #connect to the MPD server
 client.connect(host, port)
 
-async def startLoop(playState):
+#async def startLoop(playState):
+async def startLoop(status, song):
+    playState = status.get('state')
     #store progress
     playProgress = 0
     #assume we're not playing and set a timer
@@ -30,7 +33,7 @@ async def startLoop(playState):
     #store the current time
     curTime = int(time.time())
     #check to see if time has changed
-    cur = { 'status': {}, 'song': {} }
+    cur = { 'status': status, 'song': song }
     while True:
         #check to see if the time has changed
         loopTime = int(time.time())
@@ -101,7 +104,8 @@ loop = asyncio.get_event_loop()
 #start waiting for new data
 try:
     client.send_idle()
-    asyncio.ensure_future(startLoop(status['state']))  #(startLoop(status['duration'], status['elapsed']))
+    #asyncio.ensure_future(startLoop(status['state']))  #(startLoop(status['duration'], status['elapsed']))
+    asyncio.ensure_future(startLoop(status, song))  #(startLoop(status['duration'], status['elapsed']))
     loop.run_forever()
 except KeyboardInterrupt:
     print('Caught [CTRL][C]')

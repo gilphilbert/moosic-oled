@@ -1,5 +1,7 @@
 # moosic-oled
-A small Python3 utility that provides OLED display output for MPD. Used in the Moosic project.
+A small Python3 utility that provides OLED and LCD display output for MPD. Used in the Moosic project.
+
+Currently supports ssd1306 based OLEDs.
 
 ## Requirements
 * Raspberry Pi running Raspbian and Moosic (although will work with plain MPD)
