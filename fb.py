@@ -10,6 +10,10 @@ from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
 
+import sys
+sys.path.insert(1, 'vendor')
+from colorthief import ColorThief
+
 import requests
 import io
 import urllib.parse
@@ -18,9 +22,9 @@ import urllib.parse
 img_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'logo.png'))
 
 #load fonts (so we only have to do this once)
-titleFont = ImageFont.truetype('fonts/Manrope-Regular.otf', 15)
-font = ImageFont.truetype('fonts/pf_tempesta_seven.ttf', 8)
-qFont = ImageFont.truetype('fonts/uni0553-webfont.ttf', 8)
+titleFont = ImageFont.truetype('fonts/MavenPro-Bold.ttf', 60)
+font = ImageFont.truetype('fonts/MavenPro-Medium.ttf', 35)
+qFont = ImageFont.truetype('fonts/MavenPro-Medium.ttf', 22)
 
 ### --> Format time to strings for display
 def format_time(seconds):
@@ -44,37 +48,47 @@ def drawScreen(status, song):
     aaurl = "http://127.0.0.1:3000" + urllib.parse.quote("/art/album/" + artist + "/" + album)
     print(aaurl)
 
-    w, h = 1920, 480
-    img = Image.new("RGB", (w, h))
-    if state != 'stop':
-        draw = ImageDraw.Draw(img)
+    r = requests.get(aaurl, stream=True)
+    aa = Image.open(io.BytesIO(r.content))
+    thumbSize = (420, 420)
 
-        r = requests.get(aaurl, stream=True)
-        aa = Image.open(io.BytesIO(r.content))
-        thumbSize = (420, 420)
-        #aa.thumbnail(thumbSize)
-        aa = aa.resize(thumbSize)
-        img.paste(aa, (30, 30))
+    aa = aa.resize(thumbSize)
+    color_thief = ColorThief(aa)
+    dominant_color = color_thief.get_color()
+
+    w, h = 1920, 480
+    img = Image.new("RGBA", (w, h), dominant_color)
+    draw = ImageDraw.Draw(img)
+    img.paste(aa, (30, 30))
+
+    if state != 'stop':
 
         #insert text (title, artist, quality lines)
-        draw.text((420, -5), title, font=titleFont, fill=(255,255,255))
-        draw.text((420, 14), album, font=font, fill=(255,255,255))
-        #draw.text((0, 28), quality, font=font, fill=(130,130,130))
-        draw.text((420, 26), artist, font=font, fill=(255,255,255))
+        draw.text((503, 30), title, font=titleFont, fill=(255,255,255))
+        draw.text((503, 115), artist, font=font, fill=(255,255,255))
+        draw.text((503, 166), album, font=font, fill=(255,255,255))
+
+        #current song quality
+        draw.rectangle([(503,230), (683,280)], fill=(255,255,255,90))
+        draw.text((523, 240), quality, font=qFont, fill=(255,255,255))
 
         #current song elapsed (bottom left)
-        draw.text((190, 30), quality, font=qFont, fill=(255,255,255))
-
-        #current song elapsed (bottom left)
-        draw.text((0, 46), format_time(elapsed), font=font, fill=(255,255,255))
+        draw.text((503, 372), format_time(elapsed), font=font, fill=(255,255,255))
         #current song duration
         durText = format_time(duration)
-        durX = 256 - draw.textsize(format_time(duration), font)[0]
-        draw.text((durX, 46), durText, font=font, fill=(255,255,255))
+        durX = 1378 - draw.textsize(format_time(duration), font)[0]
+        draw.text((durX, 372), durText, font=font, fill=(255,255,255))
+
+        progress_start = 503
+        progress_end = 1378
+        progress_size = 660
+
         #progress bar background
-        draw.rectangle([(0,60),(256,64)], fill=(75,75,75))
+        #draw.rectangle([(0,60),(256,64)], fill=(75,75,75))
+        draw.rectangle([(progress_start, 423),(progress_end, 450)], fill=(255,255,255,90))
         #progress bar fill
-        draw.rectangle([(0,60),(round(256*perc),64)], fill=(255,255,255))
+        #draw.rectangle([(0,60),(round(256*perc),64)], fill=(255,255,255))
+        draw.rectangle([(progress_start, 423),(progress_start+round(progress_end*perc), 450)], fill=(255,255,255))
 
         if state == 'play':
             #play icon
@@ -84,12 +98,8 @@ def drawScreen(status, song):
             draw.rectangle([(124,48),(126,58)], fill='white')
             draw.rectangle([(130,48),(132,58)], fill='white')
 
-            #icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'icon-cd.png'))
-            #icon = Image.open(icon_path).convert("RGB")
-            #size = 24, 24
-            #icon.thumbnail(size, Image.ANTIALIAS)
-            #offset = 232, 12
-            #draw.paste(icon, offset) 
+        draw.rectangle([(1432,0),(1437,480)], fill=(255,255,255))
+
         img.save("out.png","PNG")
             
 

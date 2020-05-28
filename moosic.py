@@ -6,11 +6,25 @@ import asyncio
 import time
 from select import select
 
+#parse arguments
+import sys, getopt
+
 #mpd library
 from mpd import MPDClient
 
 #from ssd1306 import drawScreen
 from fb import drawScreen
+
+Single = False
+argv = sys.argv[1:]
+try:
+    opts, args = getopt.getopt(argv,"hs",["help", "single"])
+except getopt.GetoptError:
+    print ('Usage: moosic.py [-s]')
+    sys.exit(2)
+for opt, arg in opts:
+    if opt == '-s' or opt == '--single':
+        Single = True
 
 #this is the MPD host we're connecting to (should be localhost for production)
 host = '127.0.0.1'
@@ -98,18 +112,20 @@ song = client.currentsong()
 #prep data and draw sceen
 drawScreen(status, song)
 
-#create the loop
-loop = asyncio.get_event_loop()
+if Single == False:
 
-#start waiting for new data
-try:
-    client.send_idle()
-    #asyncio.ensure_future(startLoop(status['state']))  #(startLoop(status['duration'], status['elapsed']))
-    asyncio.ensure_future(startLoop(status, song))  #(startLoop(status['duration'], status['elapsed']))
-    loop.run_forever()
-except KeyboardInterrupt:
-    print('Caught [CTRL][C]')
+    #create the loop
+    loop = asyncio.get_event_loop()
+
+    #start waiting for new data
     try:
-        loop.close()
-    except:
-        pass
+        client.send_idle()
+        #asyncio.ensure_future(startLoop(status['state']))  #(startLoop(status['duration'], status['elapsed']))
+        asyncio.ensure_future(startLoop(status, song))  #(startLoop(status['duration'], status['elapsed']))
+        loop.run_forever()
+    except KeyboardInterrupt:
+        print('Caught [CTRL][C]')
+        try:
+            loop.close()
+        except:
+            pass
